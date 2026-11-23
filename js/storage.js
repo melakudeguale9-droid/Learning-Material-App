@@ -1,7 +1,7 @@
 const StoreStorage = {
   KEYS: {
-    MATERIALS: 'toby_store_materials_v2',
-    CART: 'toby_store_cart_v2'
+    MATERIALS: 'toby_store_materials_v4',
+    CART: 'toby_store_cart_v4'
   },
 
   getMaterials() {
