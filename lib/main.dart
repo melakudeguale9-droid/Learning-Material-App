@@ -27,7 +27,7 @@ class LearningMaterial {
   });
 }
 
-// Mock Data
+// ---------------- MOCK DATA ----------------
 final List<LearningMaterial> sampleMaterials = [
   LearningMaterial(
     id: '1',
@@ -36,7 +36,8 @@ final List<LearningMaterial> sampleMaterials = [
     category: 'Science',
     price: 250.0,
     type: 'Physical Book',
-    description: 'Comprehensive physics formulas, exercises, and past exam questions with step-by-step solutions.',
+    description:
+        'Comprehensive physics formulas, exercises, and past exam questions with step-by-step solutions.',
     icon: Icons.menu_book,
   ),
   LearningMaterial(
@@ -46,7 +47,8 @@ final List<LearningMaterial> sampleMaterials = [
     category: 'Computer Science',
     price: 180.0,
     type: 'PDF / E-Book',
-    description: 'Learn coding from scratch. Covers variables, data structures, OOP, and mini projects.',
+    description:
+        'Learn coding from scratch. Covers variables, data structures, OOP, and mini projects.',
     icon: Icons.picture_as_pdf,
   ),
   LearningMaterial(
@@ -56,7 +58,8 @@ final List<LearningMaterial> sampleMaterials = [
     category: 'Mathematics',
     price: 320.0,
     type: 'Physical Book',
-    description: 'Standard textbook for engineering and natural science freshman courses.',
+    description:
+        'Standard textbook for engineering and natural science freshman courses.',
     icon: Icons.calculate,
   ),
   LearningMaterial(
@@ -66,7 +69,8 @@ final List<LearningMaterial> sampleMaterials = [
     category: 'Languages',
     price: 150.0,
     type: 'PDF / E-Book',
-    description: 'Essential rules, essay templates, and vocabulary lists for students and professionals.',
+    description:
+        'Essential rules, essay templates, and vocabulary lists for students and professionals.',
     icon: Icons.language,
   ),
 ];
@@ -102,14 +106,22 @@ class _CatalogScreenState extends State<CatalogScreen> {
   String searchQuery = '';
   String selectedCategory = 'All';
 
-  final List<String> categories = ['All', 'Science', 'Mathematics', 'Computer Science', 'Languages'];
+  final List<String> categories = [
+    'All',
+    'Science',
+    'Mathematics',
+    'Computer Science',
+    'Languages',
+  ];
 
   @override
   Widget build(BuildContext context) {
     final filteredMaterials = sampleMaterials.where((item) {
-      final matchesSearch = item.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
+      final matchesSearch =
+          item.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
           item.author.toLowerCase().contains(searchQuery.toLowerCase());
-      final matchesCategory = selectedCategory == 'All' || item.category == selectedCategory;
+      final matchesCategory =
+          selectedCategory == 'All' || item.category == selectedCategory;
       return matchesSearch && matchesCategory;
     }).toList();
 
@@ -127,9 +139,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => CartScreen(cartItems: cart, onRemove: (item) {
-                        setState(() => cart.remove(item));
-                      }),
+                      builder: (context) => CartScreen(
+                        cartItems: cart,
+                        onRemove: (item) {
+                          setState(() => cart.remove(item));
+                        },
+                      ),
                     ),
                   ).then((_) => setState(() {}));
                 },
@@ -143,7 +158,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
                     backgroundColor: Colors.red,
                     child: Text(
                       '${cart.length}',
-                      style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -200,17 +219,27 @@ class _CatalogScreenState extends State<CatalogScreen> {
                     itemBuilder: (context, index) {
                       final item = filteredMaterials[index];
                       return Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         child: ListTile(
                           leading: CircleAvatar(
                             backgroundColor: Colors.deepPurple.shade50,
                             child: Icon(item.icon, color: Colors.deepPurple),
                           ),
-                          title: Text(item.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          title: Text(
+                            item.title,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                           subtitle: Text('${item.author} • ${item.type}'),
                           trailing: Text(
                             '${item.price.toStringAsFixed(0)} ETB',
-                            style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 15),
+                            style: const TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
                           ),
                           onTap: () {
                             Navigator.push(
@@ -221,7 +250,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                   onAddToCart: () {
                                     setState(() => cart.add(item));
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('${item.title} added to cart!')),
+                                      SnackBar(
+                                        content: Text(
+                                          '${item.title} added to cart!',
+                                        ),
+                                      ),
                                     );
                                   },
                                 ),
@@ -244,7 +277,11 @@ class DetailScreen extends StatelessWidget {
   final LearningMaterial material;
   final VoidCallback onAddToCart;
 
-  const DetailScreen({super.key, required this.material, required this.onAddToCart});
+  const DetailScreen({
+    super.key,
+    required this.material,
+    required this.onAddToCart,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -267,27 +304,46 @@ class DetailScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            Text(material.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            Text('By ${material.author}', style: TextStyle(color: Colors.grey.shade700, fontSize: 16)),
+            Text(
+              material.title,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'By ${material.author}',
+              style: TextStyle(color: Colors.grey.shade700, fontSize: 16),
+            ),
             const SizedBox(height: 8),
             Chip(label: Text(material.type)),
             const Divider(height: 30),
-            const Text('Description', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text(
+              'Description',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 6),
-            Text(material.description, style: const TextStyle(fontSize: 15, height: 1.4)),
+            Text(
+              material.description,
+              style: const TextStyle(fontSize: 15, height: 1.4),
+            ),
             const Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   '${material.price.toStringAsFixed(0)} ETB',
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
                 ),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
                   ),
                   icon: const Icon(Icons.add_shopping_cart),
                   label: const Text('Add to Cart'),
@@ -297,7 +353,7 @@ class DetailScreen extends StatelessWidget {
                   },
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -306,34 +362,51 @@ class DetailScreen extends StatelessWidget {
 }
 
 // ---------------- 3. CART & CHECKOUT SCREEN ----------------
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   final List<LearningMaterial> cartItems;
   final Function(LearningMaterial) onRemove;
 
-  const CartScreen({super.key, required this.cartItems, required this.onRemove});
+  const CartScreen({
+    super.key,
+    required this.cartItems,
+    required this.onRemove,
+  });
 
   @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  @override
   Widget build(BuildContext context) {
-    final double total = cartItems.fold(0, (sum, item) => sum + item.price);
+    final double total = widget.cartItems.fold(
+      0,
+      (sum, item) => sum + item.price,
+    );
 
     return Scaffold(
       appBar: AppBar(title: const Text('My Cart')),
-      body: cartItems.isEmpty
+      body: widget.cartItems.isEmpty
           ? const Center(child: Text('Your cart is empty.'))
           : Column(
               children: [
                 Expanded(
                   child: ListView.builder(
-                    itemCount: cartItems.length,
+                    itemCount: widget.cartItems.length,
                     itemBuilder: (context, index) {
-                      final item = cartItems[index];
+                      final item = widget.cartItems[index];
                       return ListTile(
-                        leading: Icon(item.icon),
+                        leading: Icon(item.icon, color: Colors.deepPurple),
                         title: Text(item.title),
-                        subtitle: Text('${item.price} ETB (${item.type})'),
+                        subtitle: Text(
+                          '${item.price.toStringAsFixed(0)} ETB (${item.type})',
+                        ),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => onRemove(item),
+                          onPressed: () {
+                            widget.onRemove(item);
+                            setState(() {});
+                          },
                         ),
                       );
                     },
@@ -343,16 +416,30 @@ class CartScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade100,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(16),
+                    ),
                   ),
                   child: Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Total:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text('${total.toStringAsFixed(0)} ETB',
-                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green)),
+                          const Text(
+                            'Total:',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            '${total.toStringAsFixed(0)} ETB',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -364,7 +451,10 @@ class CartScreen extends StatelessWidget {
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.all(14),
                           ),
-                          child: const Text('Proceed to Payment', style: TextStyle(fontSize: 16)),
+                          child: const Text(
+                            'Proceed to Payment',
+                            style: TextStyle(fontSize: 16),
+                          ),
                           onPressed: () => _showPaymentDialog(context),
                         ),
                       ),
@@ -379,7 +469,9 @@ class CartScreen extends StatelessWidget {
   void _showPaymentDialog(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) {
         return Padding(
           padding: const EdgeInsets.all(20),
@@ -387,7 +479,10 @@ class CartScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Select Payment Method', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text(
+                'Select Payment Method',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 12),
               ListTile(
                 leading: const Icon(Icons.phone_android, color: Colors.blue),
@@ -422,16 +517,18 @@ class CartScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Order Placed!'),
-        content: Text('Payment via $method initiated. You will receive an SMS/Email receipt.'),
+        content: Text(
+          'Payment via $method initiated. You will receive an SMS/Email receipt.',
+        ),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              cartItems.clear();
-              Navigator.pop(context);
+              Navigator.pop(context); // Close dialog
+              setState(() => widget.cartItems.clear());
+              Navigator.pop(context); // Return to catalog
             },
             child: const Text('OK'),
-          )
+          ),
         ],
       ),
     );
