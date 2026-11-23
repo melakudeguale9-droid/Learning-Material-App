@@ -1,7 +1,8 @@
 const StoreStorage = {
   KEYS: {
-    MATERIALS: 'toby_store_materials_v4',
-    CART: 'toby_store_cart_v4'
+    MATERIALS: 'toby_store_materials_v7',
+    CART: 'toby_store_cart_v7',
+    QUIZ_PROGRESS: 'toby_store_quiz_v7'
   },
 
   getMaterials() {
@@ -28,6 +29,24 @@ const StoreStorage = {
 
   saveCart(cart) {
     localStorage.setItem(this.KEYS.CART, JSON.stringify(cart));
+  },
+
+  getQuizProgress() {
+    try {
+      const saved = localStorage.getItem(this.KEYS.QUIZ_PROGRESS);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  },
+
+  markLevelPassed(materialId, level, score) {
+    const progress = this.getQuizProgress();
+    if (!progress[materialId]) progress[materialId] = {};
+    const prev = progress[materialId][level] || 0;
+    progress[materialId][level] = Math.max(prev, score);
+    localStorage.setItem(this.KEYS.QUIZ_PROGRESS, JSON.stringify(progress));
+    return progress[materialId];
   },
 
   resetMaterials() {
