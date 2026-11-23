@@ -30,7 +30,7 @@ body {
 .app-bar {
   background: var(--primary);
   color: #fff;
-  padding: 16px 20px;
+  padding: 14px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -48,6 +48,22 @@ body {
 .app-bar h1 {
   font-size: 1.2rem;
   font-weight: 600;
+}
+
+.btn-add-header {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-add-header:hover {
+  background: rgba(255, 255, 255, 0.28);
 }
 
 .icon-btn {
@@ -97,102 +113,85 @@ body {
   display: flex;
 }
 
-.search-box {
-  padding: 14px 16px 8px;
-}
-
-.search-box input {
-  width: 100%;
+/* Single Row: Categories + Search at the end */
+.top-filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   padding: 12px 16px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
   background: var(--surface);
-  font-size: 0.95rem;
-  outline: none;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
 }
 
-.search-box input:focus {
-  border-color: var(--primary);
-}
-
-/* Row 1: Domain Chips */
 .chips {
   display: flex;
+  align-items: center;
   gap: 8px;
   overflow-x: auto;
-  padding: 4px 16px 8px;
   scrollbar-width: none;
+  flex: 1;
+  min-width: 0;
 }
 
 .chips::-webkit-scrollbar,
-.difficulty-chips::-webkit-scrollbar,
 .resource-tabs::-webkit-scrollbar {
   display: none;
 }
 
 .chip {
-  padding: 7px 16px;
+  padding: 8px 16px;
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: var(--surface);
+  background: var(--bg);
   color: var(--text);
   font-size: 0.86rem;
-  font-weight: 500;
+  font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
   transition: 0.15s;
+}
+
+.chip:hover {
+  border-color: var(--primary);
 }
 
 .chip.active {
   background: var(--primary);
   color: #fff;
   border-color: var(--primary);
-  font-weight: 600;
 }
 
-/* Row 2: Difficulty Level Chips */
-.difficulty-chips {
+.inline-search {
   display: flex;
   align-items: center;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 4px 16px 12px;
-  border-bottom: 1px solid var(--border);
-  scrollbar-width: none;
-}
-
-.diff-label {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-right: 2px;
-  white-space: nowrap;
-}
-
-.diff-chip {
-  padding: 5px 13px;
-  border-radius: 8px;
+  background: var(--bg);
   border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  width: 220px;
+  flex-shrink: 0;
+}
+
+.inline-search:focus-within {
+  border-color: var(--primary);
   background: var(--surface);
-  color: var(--muted);
-  font-size: 0.8rem;
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: 0.15s;
 }
 
-.diff-chip:hover {
-  border-color: var(--primary);
-  color: var(--primary-dark);
+.search-icon {
+  font-size: 0.9rem;
+  margin-right: 6px;
+  opacity: 0.7;
 }
 
-.diff-chip.active {
-  background: var(--primary-light);
-  color: var(--primary-dark);
-  border-color: var(--primary);
+.inline-search input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.9rem;
+  width: 100%;
+  color: var(--text);
 }
 
 /* Grade & University Tree Navigation */
@@ -304,6 +303,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .clear-filter-btn {
@@ -387,21 +387,6 @@ body {
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 6px;
-}
-
-.diff-beginner {
-  background: #e6f4ea;
-  color: #137333;
-}
-
-.diff-intermediate {
-  background: #fef7e0;
-  color: #b06000;
-}
-
-.diff-advanced {
-  background: #fce8e6;
-  color: #c5221f;
 }
 
 /* Detail Screen & 5 Resource Tabs */
@@ -548,6 +533,7 @@ body {
   font-size: 0.88rem;
   line-height: 1.5;
   color: var(--text);
+  white-space: pre-wrap;
 }
 
 /* PDF & Link Cards */
@@ -560,6 +546,14 @@ body {
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+.pdf-viewer-frame {
+  width: 100%;
+  height: 420px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
 }
 
 .link-item {
@@ -591,7 +585,7 @@ body {
   white-space: nowrap;
 }
 
-/* Self-Test Quiz (Level 1 to 100, 10 Questions) */
+/* Self-Test Quiz (Level 1 to 100, Easy -> Medium -> Hard + Image Questions) */
 .quiz-toolbar {
   display: flex;
   align-items: center;
@@ -607,6 +601,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .level-picker select {
@@ -617,6 +612,28 @@ body {
   font-weight: 700;
   font-size: 0.9rem;
   color: var(--primary-dark);
+}
+
+.tier-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.tier-easy {
+  background: #e6f4ea;
+  color: #137333;
+}
+
+.tier-medium {
+  background: #fef7e0;
+  color: #b06000;
+}
+
+.tier-hard {
+  background: #fce8e6;
+  color: #c5221f;
 }
 
 .quiz-progress-pill {
@@ -634,6 +651,13 @@ body {
   padding: 14px;
   display: flex;
   flex-direction: column;
+  gap: 10px;
+}
+
+.q-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 8px;
 }
 
@@ -641,6 +665,33 @@ body {
   font-weight: 700;
   font-size: 0.94rem;
   color: var(--text);
+}
+
+.q-img-tag {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.q-visual-box {
+  background: #f9f8fc;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto;
+}
+
+.q-visual-box svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 
 .choice-list {
@@ -695,7 +746,7 @@ body {
   align-items: center;
 }
 
-/* Video Language Switcher */
+/* Video Player & Switcher */
 .video-lang-bar {
   display: flex;
   gap: 10px;
@@ -722,7 +773,7 @@ body {
   background: #181a24;
   color: #fff;
   border-radius: 14px;
-  padding: 20px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -736,6 +787,64 @@ body {
   font-size: 0.88rem;
   color: #cfd2e0;
   line-height: 1.45;
+}
+
+.local-video-player {
+  width: 100%;
+  max-height: 360px;
+  border-radius: 10px;
+  background: #000;
+}
+
+/* Wizard Cards (Step 1 Grade -> Step 2 Book/PDF/Link/Video -> Step 3 File vs YouTube/Link) */
+.wizard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.wizard-option-btn {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 12px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: 0.15s;
+}
+
+.wizard-option-btn:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.wizard-opt-icon {
+  font-size: 1.5rem;
+}
+
+.wizard-opt-title {
+  font-weight: 700;
+  font-size: 0.94rem;
+  color: var(--text);
+}
+
+.wizard-opt-sub {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.wizard-breadcrumb {
+  font-size: 0.8rem;
+  color: var(--primary-dark);
+  background: var(--primary-light);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  margin-bottom: 10px;
 }
 
 /* Buttons */
@@ -824,17 +933,30 @@ body {
   border-radius: 18px;
   padding: 22px;
   width: 100%;
-  max-width: 380px;
+  max-width: 390px;
 }
 
 .modal-card {
-  max-width: 470px;
+  max-width: 480px;
   max-height: 88vh;
   overflow-y: auto;
 }
 
-.dialog h3 {
-  margin-bottom: 12px;
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.close-x {
+  background: var(--bg);
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: 700;
 }
 
 .dialog p {
@@ -884,9 +1006,10 @@ body {
 
 .dialog-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   gap: 8px;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .toast {
