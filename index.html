@@ -15,7 +15,7 @@
         <h1>Learning Materials</h1>
         <div class="app-bar-actions">
           <button class="icon-btn" onclick="resetCatalog()" title="Reset Default Books">↻</button>
-          <button class="icon-btn" onclick="openAddModal()" title="Add New Book">＋</button>
+          <button class="btn-add-header" onclick="openAddModal()" title="Add Resource">＋ Add Resource</button>
           <button class="icon-btn" onclick="openCart()" title="Saved Materials">
             🔖
             <span id="cartBadge" class="badge" style="display: none;">0</span>
@@ -23,21 +23,20 @@
         </div>
       </div>
 
-      <!-- Search Bar -->
-      <div class="search-box">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Search books, subjects, authors..."
-          oninput="renderCatalog()"
-        />
+      <!-- Combined Single Row: All | Cyber Security | AI | Developer | Robotics + Search -->
+      <div class="top-filter-row">
+        <div class="chips" id="categoryChips"></div>
+        <div class="inline-search">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search"
+            aria-label="Search"
+            oninput="renderCatalog()"
+          />
+        </div>
       </div>
-
-      <!-- Row 1: Domain Categories (All, Cyber, AI, Developer, Robotics) -->
-      <div class="chips" id="categoryChips"></div>
-
-      <!-- Row 2: Skill Levels (All, Beginner, Intermediate, Advanced) -->
-      <div class="difficulty-chips" id="difficultyChips"></div>
 
       <!-- Main Workspace: Left Grade/University Tree + Right Materials List -->
       <div class="catalog-workspace">
@@ -50,7 +49,7 @@
       </div>
     </div>
 
-    <!-- 2. DETAIL SCREEN (5 FEATURES: Book, PDF, Link Reading, 10-Q Quiz Lvl 1-100, Video Amharic/English) -->
+    <!-- 2. DETAIL SCREEN (Book, PDF, Link Reading, 10-Q Quiz Lvl 1-100, Video Amharic/English) -->
     <div id="detailScreen" class="screen">
       <div class="app-bar">
         <div class="app-bar-left">
@@ -64,7 +63,6 @@
       </div>
 
       <div class="detail-body">
-        <!-- Book Header Summary -->
         <div class="detail-top-card">
           <div class="detail-hero-sm" id="detailIcon">📘</div>
           <div class="detail-meta">
@@ -72,7 +70,6 @@
             <div class="detail-author" id="detailAuthor"></div>
             <div class="pill-row">
               <span class="type-pill" id="detailCategory"></span>
-              <span class="type-pill" id="detailDifficulty"></span>
               <span class="type-pill" id="detailLevel"></span>
             </div>
           </div>
@@ -87,7 +84,6 @@
           <button class="res-tab" data-tab="video" onclick="switchResourceTab('video')">🎬 Video</button>
         </div>
 
-        <!-- Tab Content Container -->
         <div id="resourceTabContent" class="tab-panel"></div>
       </div>
     </div>
@@ -110,76 +106,14 @@
       </div>
     </div>
 
-    <!-- ADD NEW BOOK MODAL -->
+    <!-- WIZARD MODAL: 1. Select Grade -> 2. Select Type (Book/PDF/Link/Video) -> 3. File vs YouTube/Link -->
     <div id="addBookOverlay" class="dialog-overlay" onclick="closeAddModal(event)">
       <div class="dialog modal-card" onclick="event.stopPropagation()">
-        <h3>Add Learning Material</h3>
-        <form id="addBookForm" onsubmit="addNewBook(event)">
-          <div class="form-group">
-            <label for="bookTitle">Title</label>
-            <input type="text" id="bookTitle" placeholder="e.g. Safe Internet Basics" required />
-          </div>
-          <div class="form-group">
-            <label for="bookAuthor">Author</label>
-            <input type="text" id="bookAuthor" placeholder="e.g. Melaku D." required />
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="bookCategory">Category</label>
-              <select id="bookCategory">
-                <option value="Cyber">Cyber</option>
-                <option value="AI">AI</option>
-                <option value="Developer">Developer</option>
-                <option value="Robotics">Robotics</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="bookDifficulty">Skill Level</label>
-              <select id="bookDifficulty">
-                <option value="Beginner">Beginner</option>
-                <option value="Intermediate">Intermediate</option>
-                <option value="Advanced">Advanced</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="bookLevel">Grade / Academic Level</label>
-              <select id="bookLevel">
-                <option value="1 - 4 Grade">1 - 4 Grade</option>
-                <option value="5 - 8 Grade">5 - 8 Grade</option>
-                <option value="9 - 12 Grade">9 - 12 Grade</option>
-                <option value="University|1st Year">University - 1st Year</option>
-                <option value="University|2nd Year">University - 2nd Year</option>
-                <option value="University|3rd Year">University - 3rd Year</option>
-                <option value="University|4th Year">University - 4th Year</option>
-                <option value="University|5th Year">University - 5th Year</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="bookPdfUrl">PDF Link (Optional)</label>
-              <input type="url" id="bookPdfUrl" placeholder="https://..." />
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="bookAmharicVideo">Amharic Video Link (Optional)</label>
-              <input type="url" id="bookAmharicVideo" placeholder="https://youtube.com/..." />
-            </div>
-            <div class="form-group">
-              <label for="bookEnglishVideo">English Video Link (Optional)</label>
-              <input type="url" id="bookEnglishVideo" placeholder="https://youtube.com/..." />
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="bookDesc">Book Summary / Chapters</label>
-            <textarea id="bookDesc" rows="2" placeholder="Short summary of the material..." required></textarea>
-          </div>
-          <div class="dialog-actions">
-            <button type="button" class="btn-secondary" onclick="closeAddModal()">Cancel</button>
-            <button type="submit" class="btn-primary">Save Book</button>
-          </div>
-        </form>
+        <div class="modal-header">
+          <h3 id="wizardTitle">Add Resource</h3>
+          <button type="button" class="close-x" onclick="closeAddModal()">✕</button>
+        </div>
+        <div id="addWizardBody"></div>
       </div>
     </div>
 
