@@ -1,8 +1,8 @@
 const StoreStorage = {
   KEYS: {
-    MATERIALS: 'toby_store_materials_v7',
-    CART: 'toby_store_cart_v7',
-    QUIZ_PROGRESS: 'toby_store_quiz_v7'
+    MATERIALS: 'toby_store_materials_v8',
+    CART: 'toby_store_cart_v8',
+    QUIZ_PROGRESS: 'toby_store_quiz_v8'
   },
 
   getMaterials() {
