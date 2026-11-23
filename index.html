@@ -16,8 +16,8 @@
         <div class="app-bar-actions">
           <button class="icon-btn" onclick="resetCatalog()" title="Reset Default Books">↻</button>
           <button class="icon-btn" onclick="openAddModal()" title="Add New Book">＋</button>
-          <button class="icon-btn" onclick="openCart()" title="Open Cart">
-            🛒
+          <button class="icon-btn" onclick="openCart()" title="Saved Materials">
+            🔖
             <span id="cartBadge" class="badge" style="display: none;">0</span>
           </button>
         </div>
@@ -72,30 +72,25 @@
         <p class="desc-text" id="detailDesc"></p>
 
         <div class="detail-footer">
-          <div class="detail-price" id="detailPrice"></div>
-          <button class="btn-primary" id="addToCartBtn">🛒 Add to Cart</button>
+          <button class="btn-primary full-btn" id="addToCartBtn">🔖 Save to My List</button>
         </div>
       </div>
     </div>
 
-    <!-- 3. CART SCREEN -->
+    <!-- 3. SAVED LIST SCREEN -->
     <div id="cartScreen" class="screen">
       <div class="app-bar">
         <div class="app-bar-left">
           <button class="icon-btn" onclick="showScreen('catalogScreen')">←</button>
-          <h1>My Cart</h1>
+          <h1>Saved Materials</h1>
         </div>
       </div>
 
       <div class="list-area" id="cartList"></div>
 
       <div class="checkout-bar" id="checkoutBar" style="display: none;">
-        <div class="total-row">
-          <span>Total:</span>
-          <span style="color: var(--green);" id="cartTotal">0 ETB</span>
-        </div>
-        <button class="btn-primary full-btn" onclick="openPaymentSheet()">
-          Proceed to Payment
+        <button class="btn-primary full-btn" onclick="completeOrder()">
+          Access Selected Materials
         </button>
       </div>
     </div>
@@ -137,18 +132,12 @@
               </select>
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="bookType">Format</label>
-              <select id="bookType">
-                <option value="Physical Book">Physical Book</option>
-                <option value="PDF / E-Book">PDF / E-Book</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="bookPrice">Price (ETB)</label>
-              <input type="number" id="bookPrice" min="1" placeholder="200" required />
-            </div>
+          <div class="form-group">
+            <label for="bookType">Format</label>
+            <select id="bookType">
+              <option value="Physical Book">Physical Book</option>
+              <option value="PDF / E-Book">PDF / E-Book</option>
+            </select>
           </div>
           <div class="form-group">
             <label for="bookDesc">Description</label>
@@ -162,21 +151,10 @@
       </div>
     </div>
 
-    <!-- PAYMENT BOTTOM SHEET -->
-    <div id="paymentOverlay" class="overlay" onclick="closePaymentSheet(event)">
-      <div class="sheet" onclick="event.stopPropagation()">
-        <h3>Select Payment Method</h3>
-        <div class="pay-option" onclick="completeOrder('Telebirr')">📱 Telebirr</div>
-        <div class="pay-option" onclick="completeOrder('CBE Birr')">🏦 CBE Birr</div>
-        <div class="pay-option" onclick="completeOrder('Credit / Debit Card')">💳 Credit / Debit Card</div>
-        <div class="pay-option" onclick="completeOrder('Cash on Delivery')">🚚 Cash on Delivery (Physical Books)</div>
-      </div>
-    </div>
-
     <!-- CONFIRMATION DIALOG -->
     <div id="confirmDialog" class="dialog-overlay">
       <div class="dialog">
-        <h3>Order Placed!</h3>
+        <h3>Materials Ready!</h3>
         <p id="confirmMessage"></p>
         <div class="dialog-actions">
           <button class="btn-primary" onclick="finishOrder()">OK</button>
