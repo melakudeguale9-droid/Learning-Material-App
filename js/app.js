@@ -1,5 +1,4 @@
 let selectedCategory = 'All';
-let selectedDifficulty = 'All';
 let selectedLevel = 'All Levels';
 let selectedYear = '';
 let universityExpanded = true;
@@ -12,6 +11,18 @@ let currentQuizQuestions = [];
 let userQuizAnswers = {};
 let quizSubmitted = false;
 
+// Wizard State for Adding Resources:
+// Step 1: Select Level (1-4 Grade, 5-8 Grade, 9-12 Grade, University)
+// Step 2: Select Resource Type (Book, PDF, Link, Video)
+// Step 3: Select Source (File vs YouTube / Link) + Details
+let wizardState = {
+  step: 1,
+  level: '1 - 4 Grade',
+  year: '',
+  resourceType: '', // 'book' | 'pdf' | 'link' | 'video'
+  sourceMode: ''    // 'file' | 'online'
+};
+
 let materials = StoreStorage.getMaterials();
 let cart = StoreStorage.getCart();
 
@@ -23,6 +34,7 @@ function escapeHtml(text) {
 
 function sanitizeUrl(url) {
   if (!url) return '';
+  if (url.startsWith('blob:')) return url;
   try {
     const parsed = new URL(url);
     return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? parsed.href : '';
@@ -33,7 +45,7 @@ function sanitizeUrl(url) {
 
 function getCategoryIcon(category) {
   const icons = {
-    Cyber: '🛡️',
+    'Cyber Security': '🛡️',
     AI: '🧠',
     Developer: '💻',
     Robotics: '🤖'
@@ -41,21 +53,12 @@ function getCategoryIcon(category) {
   return icons[category] || '📘';
 }
 
-function getDifficultyClass(difficulty) {
-  const map = {
-    Beginner: 'diff-beginner',
-    Intermediate: 'diff-intermediate',
-    Advanced: 'diff-advanced'
-  };
-  return map[difficulty] || '';
-}
-
 function showScreen(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(screenId).classList.add('active');
 }
 
-/* 1. Top Horizontal Domain Chips */
+/* 1. Combined Top Row: Categories + Search */
 function renderChips() {
   const container = document.getElementById('categoryChips');
   container.innerHTML = TECH_CATEGORIES.map(cat => `
@@ -71,25 +74,7 @@ function selectCategory(cat) {
   renderCatalog();
 }
 
-/* 2. Second Row: Difficulty Chips */
-function renderDifficultyChips() {
-  const container = document.getElementById('difficultyChips');
-  const buttons = DIFFICULTY_LEVELS.map(diff => `
-    <button class="diff-chip ${selectedDifficulty === diff ? 'active' : ''}" onclick="selectDifficulty('${diff}')">
-      ${diff}
-    </button>
-  `).join('');
-
-  container.innerHTML = `<span class="diff-label">Level:</span>${buttons}`;
-}
-
-function selectDifficulty(diff) {
-  selectedDifficulty = diff;
-  renderDifficultyChips();
-  renderCatalog();
-}
-
-/* 3. Left Nested Grade & University Year Sidebar */
+/* 2. Left Nested Grade & University Year Sidebar */
 function renderLevelSidebar() {
   const sidebar = document.getElementById('levelSidebar');
 
@@ -170,30 +155,25 @@ function selectUniversityYear(yr) {
 
 function clearAllFilters() {
   selectedCategory = 'All';
-  selectedDifficulty = 'All';
   selectedLevel = 'All Levels';
   selectedYear = '';
   document.getElementById('searchInput').value = '';
   renderChips();
-  renderDifficultyChips();
   renderLevelSidebar();
   renderCatalog();
 }
 
-/* 4. Render Filtered Materials */
+/* 3. Render Filtered Materials */
 function renderCatalog() {
   const query = document.getElementById('searchInput').value.toLowerCase();
 
   const filtered = materials.filter(item => {
-    const itemDifficulty = item.difficulty || 'Beginner';
     const matchesSearch =
       item.title.toLowerCase().includes(query) ||
       item.author.toLowerCase().includes(query) ||
-      item.category.toLowerCase().includes(query) ||
-      itemDifficulty.toLowerCase().includes(query);
+      item.category.toLowerCase().includes(query);
 
     const matchesCat = selectedCategory === 'All' || item.category === selectedCategory;
-    const matchesDiff = selectedDifficulty === 'All' || itemDifficulty === selectedDifficulty;
 
     let matchesLevel = true;
     if (selectedLevel !== 'All Levels') {
@@ -204,22 +184,21 @@ function renderCatalog() {
       }
     }
 
-    return matchesSearch && matchesCat && matchesDiff && matchesLevel;
+    return matchesSearch && matchesCat && matchesLevel;
   });
 
   const filterBar = document.getElementById('activeFilterBar');
   const levelLabel = selectedLevel === 'University' && selectedYear
     ? `University • ${selectedYear}`
     : selectedLevel;
-  const hasFilter =
-    selectedCategory !== 'All' ||
-    selectedDifficulty !== 'All' ||
-    selectedLevel !== 'All Levels' ||
-    query !== '';
+  const hasFilter = selectedCategory !== 'All' || selectedLevel !== 'All Levels' || query !== '';
 
   filterBar.innerHTML = `
-    <span>Showing <strong>${filtered.length}</strong> (${escapeHtml(selectedCategory)} • ${escapeHtml(selectedDifficulty)} • ${escapeHtml(levelLabel)})</span>
-    ${hasFilter ? `<button class="clear-filter-btn" onclick="clearAllFilters()">Reset Filters</button>` : ''}
+    <span>Showing <strong>${filtered.length}</strong> (${escapeHtml(selectedCategory)} • ${escapeHtml(levelLabel)})</span>
+    <div style="display:flex; gap:10px; align-items:center;">
+      ${hasFilter ? `<button class="clear-filter-btn" onclick="clearAllFilters()">Reset Filters</button>` : ''}
+      <button class="clear-filter-btn" onclick="openAddModal('${escapeHtml(selectedLevel)}', '${escapeHtml(selectedYear)}')">＋ Add to ${escapeHtml(levelLabel)}</button>
+    </div>
   `;
 
   const list = document.getElementById('materialsList');
@@ -229,7 +208,6 @@ function renderCatalog() {
   }
 
   list.innerHTML = filtered.map(item => {
-    const itemDifficulty = item.difficulty || 'Beginner';
     const badgeText = item.level === 'University' && item.year
       ? `${item.level} • ${item.year}`
       : item.level;
@@ -242,7 +220,6 @@ function renderCatalog() {
           <div class="card-sub">${escapeHtml(item.author)} • Book • PDF • Quiz • Video</div>
           <div class="card-tags">
             <span class="mini-tag">${escapeHtml(item.category)}</span>
-            <span class="mini-tag ${getDifficultyClass(itemDifficulty)}">${escapeHtml(itemDifficulty)}</span>
             <span class="mini-tag">${escapeHtml(badgeText)}</span>
           </div>
         </div>
@@ -251,17 +228,16 @@ function renderCatalog() {
   }).join('');
 }
 
-/* 5. Detail Screen with 5 Tabs */
-function openDetail(id) {
+/* 4. Detail Screen with 5 Tabs */
+function openDetail(id, initialTab = 'book') {
   const item = materials.find(m => m.id === id);
   if (!item) return;
 
   currentMaterial = item;
-  currentTab = 'book';
+  currentTab = initialTab;
   currentVideoLang = 'amharic';
   currentQuizLevel = 1;
 
-  const itemDifficulty = item.difficulty || 'Beginner';
   const levelDisplay = item.level === 'University' && item.year
     ? `University (${item.year})`
     : item.level;
@@ -271,11 +247,6 @@ function openDetail(id) {
   document.getElementById('detailTitle').textContent = item.title;
   document.getElementById('detailAuthor').textContent = `By ${item.author}`;
   document.getElementById('detailCategory').textContent = item.category;
-
-  const diffEl = document.getElementById('detailDifficulty');
-  diffEl.textContent = itemDifficulty;
-  diffEl.className = `type-pill ${getDifficultyClass(itemDifficulty)}`;
-
   document.getElementById('detailLevel').textContent = levelDisplay;
 
   document.getElementById('addToCartBtn').onclick = () => {
@@ -287,7 +258,7 @@ function openDetail(id) {
     deleteMaterial(item.id);
   };
 
-  switchResourceTab('book');
+  switchResourceTab(initialTab);
   showScreen('detailScreen');
 }
 
@@ -311,9 +282,20 @@ function renderBookTab() {
     ? item.bookChapters
     : [{ title: 'Book Overview', content: item.description }];
 
+  const safeBookFileUrl = sanitizeUrl(item.bookFileUrl || '');
+
   document.getElementById('resourceTabContent').innerHTML = `
     <div class="panel-heading">📘 Book Reader & Chapters</div>
     <p class="panel-subtext">${escapeHtml(item.description)}</p>
+    ${safeBookFileUrl ? `
+      <div class="resource-box">
+        <div>
+          <div class="card-title">📁 Uploaded Book File: ${escapeHtml(item.bookFileName || 'Book_File')}</div>
+          <div class="card-sub">Open or download the uploaded book file</div>
+        </div>
+        <a class="btn-primary" href="${safeBookFileUrl}" target="_blank" rel="noopener noreferrer">Open Book File ↗</a>
+      </div>
+    ` : ''}
     <div class="chapter-list">
       ${chapters.map(ch => `
         <div class="chapter-card">
@@ -330,24 +312,25 @@ function renderPdfTab() {
   const item = currentMaterial;
   const pdf = item.pdfInfo || {
     fileName: `${item.title.replace(/\s+/g, '_')}.pdf`,
-    pages: '15 Pages',
+    pages: 'Study PDF',
     url: ''
   };
   const safePdfUrl = sanitizeUrl(pdf.url);
 
   document.getElementById('resourceTabContent').innerHTML = `
     <div class="panel-heading">📄 PDF Study Material</div>
-    <p class="panel-subtext">Read or save the printable PDF study sheet for <strong>${escapeHtml(item.title)}</strong>.</p>
+    <p class="panel-subtext">View, open, or print the PDF for <strong>${escapeHtml(item.title)}</strong>.</p>
     <div class="resource-box">
       <div>
         <div class="card-title">📄 ${escapeHtml(pdf.fileName)}</div>
-        <div class="card-sub">${escapeHtml(pdf.pages)} • ${escapeHtml(item.level)} (${escapeHtml(item.difficulty)})</div>
+        <div class="card-sub">${escapeHtml(pdf.pages)} • ${escapeHtml(item.level)}</div>
       </div>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        ${safePdfUrl ? `<a class="btn-primary" href="${safePdfUrl}" target="_blank" rel="noopener noreferrer">Open PDF Link</a>` : ''}
+        ${safePdfUrl ? `<a class="btn-primary" href="${safePdfUrl}" target="_blank" rel="noopener noreferrer">Open PDF ↗</a>` : ''}
         <button class="btn-primary" onclick="downloadPrintablePdf()">⬇️ Save / Print PDF</button>
       </div>
     </div>
+    ${safePdfUrl ? `<iframe class="pdf-viewer-frame" src="${safePdfUrl}" title="PDF Preview"></iframe>` : ''}
   `;
 }
 
@@ -375,7 +358,7 @@ function downloadPrintablePdf() {
     </head>
     <body>
       <h1>${escapeHtml(item.title)}</h1>
-      <div class="meta">Author: ${escapeHtml(item.author)} | Category: ${escapeHtml(item.category)} | Level: ${escapeHtml(item.difficulty)} (${escapeHtml(item.level)})</div>
+      <div class="meta">Author: ${escapeHtml(item.author)} | Category: ${escapeHtml(item.category)} | Level: ${escapeHtml(item.level)}</div>
       <p>${escapeHtml(item.description)}</p>
       <hr/>
       ${chapters.map(c => `<div class="chapter"><h3>${escapeHtml(c.title)}</h3><p>${escapeHtml(c.content)}</p></div>`).join('')}
@@ -392,14 +375,14 @@ function renderLinksTab() {
   const links = item.readingLinks && item.readingLinks.length
     ? item.readingLinks
     : [{
-        title: `Explore ${item.category} Lessons for Kids`,
+        title: `Explore ${item.category} Lessons`,
         source: 'code.org',
         url: 'https://code.org/'
       }];
 
   document.getElementById('resourceTabContent').innerHTML = `
-    <div class="panel-heading">🔗 Link Reading (External Resources)</div>
-    <p class="panel-subtext">Click any trusted reading link below to practice and read more online.</p>
+    <div class="panel-heading">🔗 Link Reading</div>
+    <p class="panel-subtext">Open the reading links or uploaded files below.</p>
     <div class="chapter-list">
       ${links.map(lk => {
         const href = sanitizeUrl(lk.url) || 'https://code.org/';
@@ -417,7 +400,7 @@ function renderLinksTab() {
   `;
 }
 
-/* TAB 4: SELF-TESTING (10 QUESTIONS CHOICE • LEVEL 1 TO 100) */
+/* TAB 4: SELF-TESTING (10 QUESTIONS CHOICE • LEVEL 1 TO 100 • EASY -> MEDIUM -> HARD + IMAGE QUESTIONS) */
 function loadQuizLevel(lvl) {
   currentQuizLevel = Math.min(100, Math.max(1, Number(lvl) || 1));
   currentQuizQuestions = QuizEngine.getQuestionsForLevel(currentMaterial, currentQuizLevel);
@@ -455,11 +438,13 @@ function submitQuiz() {
 function renderQuizTab() {
   const progress = StoreStorage.getQuizProgress()[currentMaterial.id] || {};
   const passedCount = Object.keys(progress).length;
+  const tier = QuizEngine.getTierInfo(currentQuizLevel);
 
   let optionsHtml = '';
   for (let i = 1; i <= 100; i++) {
+    const tierTag = i <= 30 ? 'Easy' : i <= 70 ? 'Medium' : 'Hard';
     const passedMark = progress[i] ? ` ✓ (${progress[i]}/10)` : '';
-    optionsHtml += `<option value="${i}" ${i === currentQuizLevel ? 'selected' : ''}>Level ${i}${passedMark}</option>`;
+    optionsHtml += `<option value="${i}" ${i === currentQuizLevel ? 'selected' : ''}>Level ${i} (${tierTag})${passedMark}</option>`;
   }
 
   let scoreHtml = '';
@@ -500,13 +485,21 @@ function renderQuizTab() {
       `;
     }).join('');
 
+    const visualHtml = q.svg
+      ? `<div class="q-visual-box">${q.svg}</div>`
+      : '';
+
     const explainHtml = quizSubmitted
       ? `<div class="card-sub" style="margin-top:4px; color:var(--primary-dark);">💡 ${escapeHtml(q.explain)}</div>`
       : '';
 
     return `
       <div class="question-block">
-        <div class="q-title">${q.number}. ${escapeHtml(q.q)}</div>
+        <div class="q-header-row">
+          <div class="q-title">${q.number}. ${escapeHtml(q.q)}</div>
+          ${q.svg ? `<span class="q-img-tag">🖼️ Image</span>` : ''}
+        </div>
+        ${visualHtml}
         <div class="choice-list">${choicesHtml}</div>
         ${explainHtml}
       </div>
@@ -517,12 +510,13 @@ function renderQuizTab() {
     <div class="panel-heading">📝 Self-Testing: 10 Choice Questions (Level 1 to 100)</div>
     <div class="quiz-toolbar">
       <div class="level-picker">
-        <label for="quizLevelSelect"><strong>Select Level:</strong></label>
+        <label for="quizLevelSelect"><strong>Level:</strong></label>
         <select id="quizLevelSelect" onchange="loadQuizLevel(this.value)">
           ${optionsHtml}
         </select>
+        <span class="tier-badge ${tier.cls}">${tier.label}</span>
       </div>
-      <span class="quiz-progress-pill">Completed: ${passedCount} / 100 Levels</span>
+      <span class="quiz-progress-pill">Completed: ${passedCount} / 100</span>
     </div>
 
     ${scoreHtml}
@@ -532,7 +526,7 @@ function renderQuizTab() {
   `;
 }
 
-/* TAB 5: VIDEO (AMHARIC & ENGLISH) */
+/* TAB 5: VIDEO (AMHARIC & ENGLISH + UPLOADED FILE OR YOUTUBE) */
 function switchVideoLang(lang) {
   currentVideoLang = lang;
   renderVideoTab();
@@ -544,17 +538,20 @@ function renderVideoTab() {
     amharic: {
       title: `${item.title} - የአማርኛ ትምህርት`,
       summary: `ስለ ${item.title} በአማርኛ የተዘጋጀ የቪዲዮ ትምህርት።`,
-      url: `https://www.youtube.com/results?search_query=${encodeURIComponent(item.title + ' amharic')}`
+      url: `https://www.youtube.com/results?search_query=${encodeURIComponent(item.title + ' amharic')}`,
+      isLocalFile: false
     },
     english: {
       title: `${item.title} - English Video Lesson`,
-      summary: `Educational video lesson for ${item.title} (${item.level}).`,
-      url: `https://www.youtube.com/results?search_query=${encodeURIComponent(item.title + ' for kids')}`
+      summary: `Educational video lesson for ${item.title}.`,
+      url: `https://www.youtube.com/results?search_query=${encodeURIComponent(item.title + ' for kids')}`,
+      isLocalFile: false
     }
   };
 
   const activeVideo = currentVideoLang === 'amharic' ? videos.amharic : videos.english;
   const videoUrl = sanitizeUrl(activeVideo.url) || 'https://www.youtube.com/';
+  const isLocal = activeVideo.isLocalFile || videoUrl.startsWith('blob:');
 
   document.getElementById('resourceTabContent').innerHTML = `
     <div class="panel-heading">🎬 Video Lessons (Amharic & English)</div>
@@ -568,14 +565,330 @@ function renderVideoTab() {
     </div>
 
     <div class="video-card">
-      <div style="font-size:2.2rem;">▶️</div>
       <h4>${escapeHtml(activeVideo.title)}</h4>
       <p>${escapeHtml(activeVideo.summary)}</p>
-      <a class="btn-primary" href="${videoUrl}" target="_blank" rel="noopener noreferrer" style="align-self:flex-start;">
-        ${currentVideoLang === 'amharic' ? '▶️ ቪዲዮውን በአማርኛ ክፈት' : '▶️ Watch English Video'}
-      </a>
+      ${isLocal
+        ? `<video class="local-video-player" controls src="${videoUrl}"></video>`
+        : `<a class="btn-primary" href="${videoUrl}" target="_blank" rel="noopener noreferrer" style="align-self:flex-start;">
+            ${currentVideoLang === 'amharic' ? '▶️ ቪዲዮውን YouTube ላይ ክፈት' : '▶️ Watch on YouTube'}
+          </a>`
+      }
     </div>
   `;
+}
+
+/* 5. 3-STEP RESOURCE ADDING WIZARD
+   Step 1: Choose Level (1 - 4 Grade, 5 - 8 Grade, 9 - 12 Grade, University)
+   Step 2: Choose Resource Type (Book, PDF, Link, Video)
+   Step 3: Choose Source (From File vs From YouTube / Online Link) & Save
+*/
+function openAddModal(preLevel = '', preYear = '') {
+  if (preLevel && preLevel !== 'All Levels') {
+    wizardState = {
+      step: 2,
+      level: preLevel,
+      year: preLevel === 'University' ? (preYear || '1st Year') : '',
+      resourceType: '',
+      sourceMode: ''
+    };
+  } else {
+    wizardState = {
+      step: 1,
+      level: '1 - 4 Grade',
+      year: '',
+      resourceType: '',
+      sourceMode: ''
+    };
+  }
+  renderAddWizard();
+  document.getElementById('addBookOverlay').classList.add('open');
+}
+
+function closeAddModal(e) {
+  if (!e || e.target.id === 'addBookOverlay') {
+    document.getElementById('addBookOverlay').classList.remove('open');
+  }
+}
+
+function wizardSelectLevel(level, year = '') {
+  wizardState.level = level;
+  wizardState.year = year;
+  wizardState.step = 2;
+  renderAddWizard();
+}
+
+function wizardSelectType(type) {
+  wizardState.resourceType = type;
+  wizardState.step = 3;
+  wizardState.sourceMode = '';
+  renderAddWizard();
+}
+
+function wizardSelectSource(mode) {
+  wizardState.sourceMode = mode;
+  wizardState.step = 4;
+  renderAddWizard();
+}
+
+function renderAddWizard() {
+  const titleEl = document.getElementById('wizardTitle');
+  const bodyEl = document.getElementById('addWizardBody');
+  const levelDisplay = wizardState.level === 'University' && wizardState.year
+    ? `University • ${wizardState.year}`
+    : wizardState.level;
+
+  // STEP 1: Select Grade Level
+  if (wizardState.step === 1) {
+    titleEl.textContent = 'Step 1: Select Grade / Level';
+    bodyEl.innerHTML = `
+      <p style="margin-bottom:8px;">Choose the academic level where you want to add resources:</p>
+      <div class="wizard-grid">
+        <button type="button" class="wizard-option-btn" onclick="wizardSelectLevel('1 - 4 Grade')">
+          <span class="wizard-opt-icon">🎒</span>
+          <span class="wizard-opt-title">1 - 4 Grade</span>
+          <span class="wizard-opt-sub">Book, PDF, Link, Video</span>
+        </button>
+        <button type="button" class="wizard-option-btn" onclick="wizardSelectLevel('5 - 8 Grade')">
+          <span class="wizard-opt-icon">📚</span>
+          <span class="wizard-opt-title">5 - 8 Grade</span>
+          <span class="wizard-opt-sub">Book, PDF, Link, Video</span>
+        </button>
+        <button type="button" class="wizard-option-btn" onclick="wizardSelectLevel('9 - 12 Grade')">
+          <span class="wizard-opt-icon">🎓</span>
+          <span class="wizard-opt-title">9 - 12 Grade</span>
+          <span class="wizard-opt-sub">Book, PDF, Link, Video</span>
+        </button>
+        <button type="button" class="wizard-option-btn" onclick="wizardSelectLevel('University', '1st Year')">
+          <span class="wizard-opt-icon">🏛️</span>
+          <span class="wizard-opt-title">University</span>
+          <span class="wizard-opt-sub">1st – 5th Year</span>
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  // STEP 2: Choose Book, PDF, Link, or Video
+  if (wizardState.step === 2) {
+    titleEl.textContent = 'Step 2: Choose Resource Type';
+    const yearSelector = wizardState.level === 'University' ? `
+      <div class="form-group">
+        <label for="wizUniYear">University Year</label>
+        <select id="wizUniYear" onchange="wizardState.year = this.value">
+          ${UNIVERSITY_YEARS.map(y => `<option value="${y}" ${wizardState.year === y ? 'selected' : ''}>${y}</option>`).join('')}
+        </select>
+      </div>
+    ` : '';
+
+    bodyEl.innerHTML = `
+      <div class="wizard-breadcrumb">Selected: ${escapeHtml(levelDisplay)}</div>
+      ${yearSelector}
+      <p style="margin-bottom:8px;">What do you want to add?</p>
+      <div class="wizard-grid">
+        <button type="button" class="wizard-option-btn" onclick="wizardSelectType('book')">
+          <span class="wizard-opt-icon">📘</span>
+          <span class="wizard-opt-title">Book</span>
+          <span class="wizard-opt-sub">File or Chapter Text</span>
+        </button>
+        <button type="button" class="wizard-option-btn" onclick="wizardSelectType('pdf')">
+          <span class="wizard-opt-icon">📄</span>
+          <span class="wizard-opt-title">PDF</span>
+          <span class="wizard-opt-sub">Upload PDF or Link</span>
+        </button>
+        <button type="button" class="wizard-option-btn" onclick="wizardSelectType('link')">
+          <span class="wizard-opt-icon">🔗</span>
+          <span class="wizard-opt-title">Link</span>
+          <span class="wizard-opt-sub">File or Reading URL</span>
+        </button>
+        <button type="button" class="wizard-option-btn" onclick="wizardSelectType('video')">
+          <span class="wizard-opt-icon">🎬</span>
+          <span class="wizard-opt-title">Video</span>
+          <span class="wizard-opt-sub">From File or YouTube</span>
+        </button>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="btn-secondary" onclick="wizardState.step=1; renderAddWizard()">← Back</button>
+      </div>
+    `;
+    return;
+  }
+
+  const typeLabels = { book: '📘 Book', pdf: '📄 PDF', link: '🔗 Link', video: '🎬 Video' };
+  const onlineLabels = {
+    book: { title: 'Write / Online Book', sub: 'Enter chapters or online book link', icon: '✍️' },
+    pdf: { title: 'From PDF Link', sub: 'Paste online PDF URL', icon: '🌐' },
+    link: { title: 'From Web URL', sub: 'Paste reading website link', icon: '🌐' },
+    video: { title: 'From YouTube', sub: 'Paste YouTube video link', icon: '▶️' }
+  };
+
+  // STEP 3: Choose Source (From File vs From YouTube / Online Link)
+  if (wizardState.step === 3) {
+    const onlineOpt = onlineLabels[wizardState.resourceType];
+    titleEl.textContent = `Step 3: ${typeLabels[wizardState.resourceType]} Source`;
+    bodyEl.innerHTML = `
+      <div class="wizard-breadcrumb">${escapeHtml(levelDisplay)} → ${typeLabels[wizardState.resourceType]}</div>
+      <p style="margin-bottom:8px;">Choose how you want to add this ${wizardState.resourceType}:</p>
+      <div class="wizard-grid">
+        <button type="button" class="wizard-option-btn" onclick="wizardSelectSource('file')">
+          <span class="wizard-opt-icon">📁</span>
+          <span class="wizard-opt-title">From File</span>
+          <span class="wizard-opt-sub">Choose file from computer/phone</span>
+        </button>
+        <button type="button" class="wizard-option-btn" onclick="wizardSelectSource('online')">
+          <span class="wizard-opt-icon">${onlineOpt.icon}</span>
+          <span class="wizard-opt-title">${onlineOpt.title}</span>
+          <span class="wizard-opt-sub">${onlineOpt.sub}</span>
+        </button>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="btn-secondary" onclick="wizardState.step=2; renderAddWizard()">← Back</button>
+      </div>
+    `;
+    return;
+  }
+
+  // STEP 4: Final Input Form
+  const isFile = wizardState.sourceMode === 'file';
+  const rType = wizardState.resourceType;
+  titleEl.textContent = `Add ${typeLabels[rType]} (${isFile ? 'From File' : onlineLabels[rType].title})`;
+
+  const acceptAttr = rType === 'video'
+    ? 'video/*'
+    : rType === 'pdf'
+      ? '.pdf,application/pdf'
+      : '*/*';
+
+  const sourceInputHtml = isFile
+    ? `
+      <div class="form-group">
+        <label for="wizFile">Select ${rType.toUpperCase()} File</label>
+        <input type="file" id="wizFile" accept="${acceptAttr}" required />
+      </div>
+    `
+    : `
+      <div class="form-group">
+        <label for="wizUrl">${rType === 'video' ? 'YouTube Video URL' : rType === 'book' ? 'Online Book URL (Optional)' : 'URL Link'}</label>
+        <input type="url" id="wizUrl" placeholder="${rType === 'video' ? 'https://www.youtube.com/watch?v=...' : 'https://...'}" ${rType === 'book' ? '' : 'required'} />
+      </div>
+    `;
+
+  const videoLangHtml = rType === 'video' ? `
+    <div class="form-group">
+      <label for="wizVideoLang">Video Language</label>
+      <select id="wizVideoLang">
+        <option value="amharic">🇪🇹 አማርኛ (Amharic)</option>
+        <option value="english">🇬🇧 English</option>
+      </select>
+    </div>
+  ` : '';
+
+  bodyEl.innerHTML = `
+    <div class="wizard-breadcrumb">${escapeHtml(levelDisplay)} → ${typeLabels[rType]} → ${isFile ? '📁 File' : onlineLabels[rType].title}</div>
+    <form onsubmit="saveWizardResource(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="wizCategory">Category</label>
+          <select id="wizCategory">
+            <option value="Cyber Security">Cyber Security</option>
+            <option value="AI">AI</option>
+            <option value="Developer">Developer</option>
+            <option value="Robotics">Robotics</option>
+          </select>
+        </div>
+        ${videoLangHtml}
+      </div>
+      <div class="form-group">
+        <label for="wizTitle">Title</label>
+        <input type="text" id="wizTitle" placeholder="Enter title..." required />
+      </div>
+      <div class="form-group">
+        <label for="wizAuthor">Author / Instructor</label>
+        <input type="text" id="wizAuthor" value="Melaku Deguale" required />
+      </div>
+      ${sourceInputHtml}
+      <div class="form-group">
+        <label for="wizDesc">${rType === 'book' ? 'Book Chapter / Content' : 'Short Description'}</label>
+        <textarea id="wizDesc" rows="3" placeholder="Write summary or lesson text..." required></textarea>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="btn-secondary" onclick="wizardState.step=3; renderAddWizard()">← Back</button>
+        <button type="submit" class="btn-primary">Save Resource</button>
+      </div>
+    </form>
+  `;
+}
+
+function saveWizardResource(event) {
+  event.preventDefault();
+  const category = document.getElementById('wizCategory').value;
+  const title = document.getElementById('wizTitle').value.trim();
+  const author = document.getElementById('wizAuthor').value.trim();
+  const desc = document.getElementById('wizDesc').value.trim();
+  const rType = wizardState.resourceType;
+  const isFile = wizardState.sourceMode === 'file';
+
+  let fileUrl = '';
+  let fileName = '';
+  if (isFile) {
+    const fileInput = document.getElementById('wizFile');
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+      const f = fileInput.files[0];
+      fileName = f.name;
+      fileUrl = URL.createObjectURL(f);
+    }
+  } else {
+    const urlInput = document.getElementById('wizUrl');
+    fileUrl = urlInput ? urlInput.value.trim() : '';
+  }
+
+  const newItem = {
+    id: Date.now().toString(),
+    title,
+    author,
+    category,
+    level: wizardState.level,
+    year: wizardState.year,
+    icon: getCategoryIcon(category),
+    description: desc,
+    bookChapters: [{ title: 'Chapter 1: Lesson Content', content: desc }],
+    bookFileUrl: rType === 'book' && isFile ? fileUrl : '',
+    bookFileName: rType === 'book' && isFile ? fileName : '',
+    pdfInfo: {
+      fileName: rType === 'pdf' && fileName ? fileName : `${title.replace(/\s+/g, '_')}.pdf`,
+      pages: isFile ? 'Uploaded PDF' : 'PDF Document',
+      url: rType === 'pdf' ? fileUrl : ''
+    },
+    readingLinks: rType === 'link'
+      ? [{ title: fileName || title, source: isFile ? 'Uploaded File' : fileUrl, url: fileUrl }]
+      : [{ title: `More ${category} Reading`, source: 'Code.org', url: 'https://code.org/' }],
+    videos: {
+      amharic: {
+        title: `${title} (አማርኛ)`,
+        summary: desc,
+        url: rType === 'video' && document.getElementById('wizVideoLang')?.value === 'amharic'
+          ? fileUrl
+          : `https://www.youtube.com/results?search_query=${encodeURIComponent(title + ' amharic')}`,
+        isLocalFile: rType === 'video' && isFile && document.getElementById('wizVideoLang')?.value === 'amharic'
+      },
+      english: {
+        title: `${title} (English)`,
+        summary: desc,
+        url: rType === 'video' && document.getElementById('wizVideoLang')?.value === 'english'
+          ? fileUrl
+          : `https://www.youtube.com/results?search_query=${encodeURIComponent(title)}`,
+        isLocalFile: rType === 'video' && isFile && document.getElementById('wizVideoLang')?.value === 'english'
+      }
+    }
+  };
+
+  materials.unshift(newItem);
+  StoreStorage.saveMaterials(materials);
+  closeAddModal();
+  renderCatalog();
+
+  const tabMap = { book: 'book', pdf: 'pdf', link: 'links', video: 'video' };
+  openDetail(newItem.id, tabMap[rType] || 'book');
+  showToast(`"${title}" added!`);
 }
 
 /* 6. Save / Delete / Reset */
@@ -596,84 +909,16 @@ function deleteMaterial(id) {
   updateCartBadge();
   renderCatalog();
   showScreen('catalogScreen');
-  showToast('Material removed from catalog.');
+  showToast('Material removed.');
 }
 
 function resetCatalog() {
   materials = StoreStorage.resetMaterials();
   clearAllFilters();
-  showToast('Default 1–4 Grade catalog restored!');
+  showToast('Default catalog restored!');
 }
 
-/* 7. Add New Book Modal */
-function openAddModal() {
-  document.getElementById('addBookOverlay').classList.add('open');
-}
-
-function closeAddModal(e) {
-  if (!e || e.target.id === 'addBookOverlay') {
-    document.getElementById('addBookOverlay').classList.remove('open');
-  }
-}
-
-function addNewBook(event) {
-  event.preventDefault();
-  const title = document.getElementById('bookTitle').value.trim();
-  const author = document.getElementById('bookAuthor').value.trim();
-  const category = document.getElementById('bookCategory').value;
-  const difficulty = document.getElementById('bookDifficulty').value;
-  const levelRaw = document.getElementById('bookLevel').value;
-  const pdfUrl = document.getElementById('bookPdfUrl').value.trim();
-  const amharicVideo = document.getElementById('bookAmharicVideo').value.trim();
-  const englishVideo = document.getElementById('bookEnglishVideo').value.trim();
-  const description = document.getElementById('bookDesc').value.trim();
-
-  if (!title || !author) return;
-
-  const [level, year = ''] = levelRaw.split('|');
-
-  const newBook = {
-    id: Date.now().toString(),
-    title,
-    author,
-    category,
-    difficulty,
-    level,
-    year,
-    icon: getCategoryIcon(category),
-    description,
-    bookChapters: [{ title: 'Chapter 1: Overview', content: description }],
-    pdfInfo: {
-      fileName: `${title.replace(/\s+/g, '_')}.pdf`,
-      pages: 'Printable PDF',
-      url: pdfUrl
-    },
-    readingLinks: [
-      { title: `More ${category} Reading Resources`, source: 'Code.org', url: 'https://code.org/' }
-    ],
-    videos: {
-      amharic: {
-        title: `${title} (አማርኛ)`,
-        summary: `ስለ ${title} በአማርኛ የተዘጋጀ ቪዲዮ።`,
-        url: amharicVideo || `https://www.youtube.com/results?search_query=${encodeURIComponent(title + ' amharic')}`
-      },
-      english: {
-        title: `${title} (English)`,
-        summary: `Video lesson for ${title}.`,
-        url: englishVideo || `https://www.youtube.com/results?search_query=${encodeURIComponent(title + ' for kids')}`
-      }
-    }
-  };
-
-  materials.unshift(newBook);
-  StoreStorage.saveMaterials(materials);
-  document.getElementById('addBookForm').reset();
-  closeAddModal();
-  renderCatalog();
-  showToast(`"${title}" added with Book, PDF, Links, 10-Q Quiz & Videos!`);
-}
-
-/* 8. Saved Materials List */
+/* 7. Saved Materials List */
 function updateCartBadge() {
   const badge = document.getElementById('cartBadge');
   if (cart.length > 0) {
@@ -706,7 +951,7 @@ function renderCart() {
       <div class="avatar">${item.icon}</div>
       <div class="card-info" onclick="openDetail('${escapeHtml(item.id)}')" style="cursor:pointer;">
         <div class="card-title">${escapeHtml(item.title)}</div>
-        <div class="card-sub">${escapeHtml(item.category)} • ${escapeHtml(item.difficulty || 'Beginner')} • ${escapeHtml(item.level)}</div>
+        <div class="card-sub">${escapeHtml(item.category)} • ${escapeHtml(item.level)}</div>
       </div>
       <button class="delete-btn" onclick="removeFromCart(${idx})" title="Remove">🗑️</button>
     </div>
@@ -742,7 +987,6 @@ function showToast(msg) {
 }
 
 renderChips();
-renderDifficultyChips();
 renderLevelSidebar();
 renderCatalog();
 updateCartBadge();
