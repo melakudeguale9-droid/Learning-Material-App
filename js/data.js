@@ -1,61 +1,117 @@
-const CATEGORIES = [
-  'All',
-  'Science',
-  'Mathematics',
-  'Computer Science',
-  'Cybersecurity',
-  'Languages'
+const TECH_CATEGORIES = ['All', 'Cyber', 'AI', 'Developer', 'Robotics'];
+
+const GRADE_LEVELS = [
+  '1 - 4 Grade',
+  '5 - 8 Grade',
+  '9 - 12 Grade'
+];
+
+const UNIVERSITY_YEARS = [
+  '1st Year',
+  '2nd Year',
+  '3rd Year',
+  '4th Year',
+  '5th Year'
 ];
 
 const DEFAULT_MATERIALS = [
   {
     id: '1',
-    title: 'Grade 12 Physics & Exam Guide',
-    author: 'Dr. Abebe T.',
-    category: 'Science',
-    price: 250,
+    title: 'Kids Logic & Scratch Coding',
+    author: 'Hana M.',
+    category: 'Developer',
+    level: '1 - 4 Grade',
+    year: '',
     type: 'Physical Book',
-    description: 'Comprehensive physics formulas, exercises, and past exam questions with step-by-step solutions.',
-    icon: '📘'
+    description: 'Fun visual programming puzzles and basic computer logic designed for grades 1 to 4 students.',
+    icon: '💻'
   },
   {
     id: '2',
-    title: 'Python Programming for Beginners',
-    author: 'Sarah Jenkins',
-    category: 'Computer Science',
-    price: 180,
-    type: 'PDF / E-Book',
-    description: 'Learn coding from scratch. Covers variables, data structures, OOP, and mini projects.',
-    icon: '📄'
+    title: 'Junior Robotics & Sensors Lab',
+    author: 'Dawit K.',
+    category: 'Robotics',
+    level: '5 - 8 Grade',
+    year: '',
+    type: 'Physical Book',
+    description: 'Introduction to motors, LEDs, simple circuits, and building your first mini robot.',
+    icon: '🤖'
   },
   {
     id: '3',
-    title: 'University Calculus & Linear Algebra',
-    author: 'Prof. Markos G.',
-    category: 'Mathematics',
-    price: 320,
-    type: 'Physical Book',
-    description: 'Standard textbook for engineering and natural science freshman courses.',
-    icon: '🧮'
-  },
-  {
-    id: '4',
-    title: 'Web Application Security & Penetration Testing',
+    title: 'High School Cyber Safety & Networking',
     author: 'Melaku Deguale',
-    category: 'Cybersecurity',
-    price: 290,
+    category: 'Cyber',
+    level: '9 - 12 Grade',
+    year: '',
     type: 'PDF / E-Book',
-    description: 'Practical guide to OWASP Top 10, Nmap reconnaissance, Burp Suite testing, and Linux hardening.',
+    description: 'Essential internet safety, password security, Linux basics, and networking concepts for grade 9-12.',
     icon: '🛡️'
   },
   {
-    id: '5',
-    title: 'English Grammar & Writing Skills',
-    author: 'Helen Brook',
-    category: 'Languages',
-    price: 150,
+    id: '4',
+    title: 'Introduction to Artificial Intelligence',
+    author: 'Dr. Selamawit A.',
+    category: 'AI',
+    level: '9 - 12 Grade',
+    year: '',
     type: 'PDF / E-Book',
-    description: 'Essential rules, essay templates, and vocabulary lists for students and professionals.',
-    icon: '🌐'
+    description: 'Understand how machine learning, neural networks, and smart assistants work.',
+    icon: '🧠'
+  },
+  {
+    id: '5',
+    title: 'Freshman C++ & Programming Fundamentals',
+    author: 'Prof. Markos G.',
+    category: 'Developer',
+    level: 'University',
+    year: '1st Year',
+    type: 'Physical Book',
+    description: 'Complete 1st-year university programming guide covering variables, loops, functions, and arrays.',
+    icon: '💻'
+  },
+  {
+    id: '6',
+    title: 'Data Structures & Algorithms in Python',
+    author: 'Sarah Jenkins',
+    category: 'Developer',
+    level: 'University',
+    year: '2nd Year',
+    type: 'PDF / E-Book',
+    description: 'Trees, graphs, sorting algorithms, and complexity analysis for 2nd-year CS & IT students.',
+    icon: '💻'
+  },
+  {
+    id: '7',
+    title: 'Web Application Security & Penetration Testing',
+    author: 'Melaku Deguale',
+    category: 'Cyber',
+    level: 'University',
+    year: '3rd Year',
+    type: 'PDF / E-Book',
+    description: 'Hands-on OWASP Top 10 vulnerabilities, Burp Suite, Nmap reconnaissance, and Linux privilege escalation.',
+    icon: '🛡️'
+  },
+  {
+    id: '8',
+    title: 'Deep Learning & Computer Vision',
+    author: 'Dr. Abel T.',
+    category: 'AI',
+    level: 'University',
+    year: '4th Year',
+    type: 'PDF / E-Book',
+    description: 'Convolutional neural networks, image classification, and modern AI model deployment.',
+    icon: '🧠'
+  },
+  {
+    id: '9',
+    title: 'Autonomous Embedded Robotics Systems',
+    author: 'Eng. Yonas B.',
+    category: 'Robotics',
+    level: 'University',
+    year: '5th Year',
+    type: 'Physical Book',
+    description: 'ROS, microcontroller kinematics, LiDAR mapping, and capstone engineering robotics design.',
+    icon: '🤖'
   }
 ];
