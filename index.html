@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Toby Learning Store</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
 </head>
 <body>
   <div class="app-shell">
@@ -13,8 +14,9 @@
       <div class="app-bar">
         <h1>Learning Materials</h1>
         <div class="app-bar-actions">
-          <button class="icon-btn" onclick="openAddModal()" title="Add Material" aria-label="Add Material">＋</button>
-          <button class="icon-btn" onclick="openCart()" title="Open Cart" aria-label="Open Cart">
+          <button class="icon-btn" onclick="resetCatalog()" title="Reset Default Books">↻</button>
+          <button class="icon-btn" onclick="openAddModal()" title="Add New Book">＋</button>
+          <button class="icon-btn" onclick="openCart()" title="Open Cart">
             🛒
             <span id="cartBadge" class="badge" style="display: none;">0</span>
           </button>
@@ -41,13 +43,17 @@
           <button class="icon-btn" onclick="showScreen('catalogScreen')">←</button>
           <h1 id="detailHeaderTitle">Details</h1>
         </div>
+        <button class="icon-btn" id="deleteBookBtn" title="Delete Book from Store">🗑️</button>
       </div>
 
       <div class="detail-body">
         <div class="detail-hero" id="detailIcon">📘</div>
         <div class="detail-title" id="detailTitle"></div>
         <div class="detail-author" id="detailAuthor"></div>
-        <span class="type-pill" id="detailType"></span>
+        <div class="pill-row">
+          <span class="type-pill" id="detailCategory"></span>
+          <span class="type-pill" id="detailType"></span>
+        </div>
 
         <div class="divider"></div>
         <div class="desc-heading">Description</div>
@@ -89,7 +95,7 @@
         <form id="addBookForm" onsubmit="addNewBook(event)">
           <div class="form-group">
             <label for="bookTitle">Title</label>
-            <input type="text" id="bookTitle" placeholder="e.g. Network Security Basics" required />
+            <input type="text" id="bookTitle" placeholder="e.g. Web Security Essentials" required />
           </div>
           <div class="form-group">
             <label for="bookAuthor">Author</label>
@@ -102,6 +108,7 @@
                 <option value="Science">Science</option>
                 <option value="Mathematics">Mathematics</option>
                 <option value="Computer Science">Computer Science</option>
+                <option value="Cybersecurity">Cybersecurity</option>
                 <option value="Languages">Languages</option>
               </select>
             </div>
@@ -154,6 +161,8 @@
     <div id="toast" class="toast"></div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
