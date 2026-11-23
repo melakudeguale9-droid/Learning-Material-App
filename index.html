@@ -4,493 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Toby Learning Store</title>
-  <style>
-    :root {
-      --primary: #5e35b1;
-      --primary-dark: #4527a0;
-      --primary-light: #ede7f6;
-      --bg: #f4f3f8;
-      --surface: #ffffff;
-      --text: #1c1b1f;
-      --muted: #5f5e64;
-      --green: #1b873f;
-      --red: #d32f2f;
-      --border: #e4e1ec;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    }
-
-    body {
-      background: #12131a;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 16px;
-    }
-
-    /* Mobile App Shell */
-    .app-shell {
-      width: 100%;
-      max-width: 420px;
-      height: 780px;
-      max-height: 92vh;
-      background: var(--bg);
-      border-radius: 28px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
-      border: 6px solid #262836;
-      position: relative;
-    }
-
-    /* App Bar */
-    .app-bar {
-      background: var(--primary);
-      color: #fff;
-      padding: 16px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      z-index: 10;
-    }
-
-    .app-bar-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .app-bar h1 {
-      font-size: 1.15rem;
-      font-weight: 600;
-    }
-
-    .icon-btn {
-      background: transparent;
-      border: none;
-      color: inherit;
-      cursor: pointer;
-      position: relative;
-      padding: 6px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-    }
-
-    .icon-btn:hover {
-      background: rgba(255, 255, 255, 0.15);
-    }
-
-    .badge {
-      position: absolute;
-      top: 0;
-      right: 0;
-      background: var(--red);
-      color: #fff;
-      font-size: 0.7rem;
-      font-weight: 700;
-      min-width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 4px;
-    }
-
-    /* Screens */
-    .screen {
-      display: none;
-      flex: 1;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .screen.active {
-      display: flex;
-    }
-
-    /* Search & Filters */
-    .search-box {
-      padding: 12px 14px 8px;
-    }
-
-    .search-box input {
-      width: 100%;
-      padding: 11px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      font-size: 0.92rem;
-      outline: none;
-    }
-
-    .search-box input:focus {
-      border-color: var(--primary);
-    }
-
-    .chips {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding: 4px 14px 10px;
-      scrollbar-width: none;
-    }
-
-    .chips::-webkit-scrollbar {
-      display: none;
-    }
-
-    .chip {
-      padding: 6px 14px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text);
-      font-size: 0.82rem;
-      font-weight: 500;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: 0.15s;
-    }
-
-    .chip.active {
-      background: var(--primary-light);
-      color: var(--primary-dark);
-      border-color: var(--primary);
-      font-weight: 600;
-    }
-
-    /* Catalog List */
-    .list-area {
-      flex: 1;
-      overflow-y: auto;
-      padding: 4px 14px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .card {
-      background: var(--surface);
-      border-radius: 14px;
-      padding: 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-      cursor: pointer;
-      transition: transform 0.12s;
-    }
-
-    .card:hover {
-      transform: translateY(-1px);
-    }
-
-    .avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: var(--primary-light);
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.3rem;
-      flex-shrink: 0;
-    }
-
-    .card-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .card-title {
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: var(--text);
-      margin-bottom: 3px;
-    }
-
-    .card-sub {
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
-    .price {
-      color: var(--green);
-      font-weight: 700;
-      font-size: 0.95rem;
-      white-space: nowrap;
-    }
-
-    /* Detail Screen */
-    .detail-body {
-      flex: 1;
-      padding: 20px 18px;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-    }
-
-    .detail-hero {
-      width: 130px;
-      height: 130px;
-      background: var(--primary-light);
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3.5rem;
-      margin: 6px auto 20px;
-    }
-
-    .detail-title {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-
-    .detail-author {
-      color: var(--muted);
-      font-size: 0.95rem;
-      margin-bottom: 10px;
-    }
-
-    .type-pill {
-      display: inline-block;
-      align-self: flex-start;
-      background: var(--primary-light);
-      color: var(--primary-dark);
-      padding: 4px 12px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 18px 0;
-    }
-
-    .desc-heading {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .desc-text {
-      font-size: 0.92rem;
-      line-height: 1.5;
-      color: #3a393f;
-    }
-
-    .detail-footer {
-      margin-top: auto;
-      padding-top: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .detail-price {
-      font-size: 1.45rem;
-      font-weight: 800;
-      color: var(--green);
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 999px;
-      padding: 12px 22px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-dark);
-    }
-
-    /* Cart Screen */
-    .cart-item {
-      background: var(--surface);
-      border-radius: 12px;
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .delete-btn {
-      background: none;
-      border: none;
-      color: var(--red);
-      font-size: 1.15rem;
-      cursor: pointer;
-      padding: 4px 8px;
-    }
-
-    .checkout-bar {
-      background: var(--surface);
-      padding: 16px 18px;
-      border-top: 1px solid var(--border);
-      border-radius: 18px 18px 0 0;
-    }
-
-    .total-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      font-size: 1.1rem;
-      font-weight: 700;
-    }
-
-    .full-btn {
-      width: 100%;
-      justify-content: center;
-      border-radius: 12px;
-      padding: 14px;
-    }
-
-    /* Bottom Sheet & Dialog */
-    .overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      display: none;
-      flex-direction: column;
-      justify-content: flex-end;
-      z-index: 20;
-    }
-
-    .overlay.open {
-      display: flex;
-    }
-
-    .sheet {
-      background: var(--surface);
-      border-radius: 22px 22px 0 0;
-      padding: 20px;
-    }
-
-    .sheet h3 {
-      margin-bottom: 12px;
-      font-size: 1.08rem;
-    }
-
-    .pay-option {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 8px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 500;
-    }
-
-    .pay-option:hover {
-      background: var(--bg);
-    }
-
-    .dialog-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 30;
-    }
-
-    .dialog-overlay.open {
-      display: flex;
-    }
-
-    .dialog {
-      background: var(--surface);
-      border-radius: 18px;
-      padding: 22px;
-      width: 100%;
-      max-width: 320px;
-    }
-
-    .dialog h3 {
-      margin-bottom: 8px;
-    }
-
-    .dialog p {
-      font-size: 0.9rem;
-      color: var(--muted);
-      line-height: 1.45;
-      margin-bottom: 16px;
-    }
-
-    .dialog-actions {
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    .toast {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #2b2930;
-      color: #fff;
-      padding: 10px 16px;
-      border-radius: 10px;
-      font-size: 0.85rem;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s;
-      white-space: nowrap;
-      z-index: 40;
-    }
-
-    .toast.show {
-      opacity: 1;
-    }
-
-    .empty-state {
-      text-align: center;
-      color: var(--muted);
-      margin-top: 60px;
-      font-size: 0.95rem;
-    }
-
-    @media (max-width: 480px) {
-      body {
-        padding: 0;
-      }
-      .app-shell {
-        max-width: 100%;
-        height: 100vh;
-        max-height: 100vh;
-        border-radius: 0;
-        border: none;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="app-shell">
@@ -498,10 +12,13 @@
     <div id="catalogScreen" class="screen active">
       <div class="app-bar">
         <h1>Learning Materials</h1>
-        <button class="icon-btn" onclick="openCart()" aria-label="Open Cart">
-          🛒
-          <span id="cartBadge" class="badge" style="display: none;">0</span>
-        </button>
+        <div class="app-bar-actions">
+          <button class="icon-btn" onclick="openAddModal()" title="Add Material" aria-label="Add Material">＋</button>
+          <button class="icon-btn" onclick="openCart()" title="Open Cart" aria-label="Open Cart">
+            🛒
+            <span id="cartBadge" class="badge" style="display: none;">0</span>
+          </button>
+        </div>
       </div>
 
       <div class="search-box">
@@ -565,6 +82,53 @@
       </div>
     </div>
 
+    <!-- ADD NEW BOOK MODAL -->
+    <div id="addBookOverlay" class="dialog-overlay" onclick="closeAddModal(event)">
+      <div class="dialog modal-card" onclick="event.stopPropagation()">
+        <h3>Add Learning Material</h3>
+        <form id="addBookForm" onsubmit="addNewBook(event)">
+          <div class="form-group">
+            <label for="bookTitle">Title</label>
+            <input type="text" id="bookTitle" placeholder="e.g. Network Security Basics" required />
+          </div>
+          <div class="form-group">
+            <label for="bookAuthor">Author</label>
+            <input type="text" id="bookAuthor" placeholder="e.g. Melaku D." required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bookCategory">Category</label>
+              <select id="bookCategory">
+                <option value="Science">Science</option>
+                <option value="Mathematics">Mathematics</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Languages">Languages</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="bookPrice">Price (ETB)</label>
+              <input type="number" id="bookPrice" min="1" placeholder="200" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="bookType">Format</label>
+            <select id="bookType">
+              <option value="Physical Book">Physical Book</option>
+              <option value="PDF / E-Book">PDF / E-Book</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="bookDesc">Description</label>
+            <textarea id="bookDesc" rows="2" placeholder="Short summary of the material..." required></textarea>
+          </div>
+          <div class="dialog-actions">
+            <button type="button" class="btn-secondary" onclick="closeAddModal()">Cancel</button>
+            <button type="submit" class="btn-primary">Save Book</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- PAYMENT BOTTOM SHEET -->
     <div id="paymentOverlay" class="overlay" onclick="closePaymentSheet(event)">
       <div class="sheet" onclick="event.stopPropagation()">
@@ -590,210 +154,6 @@
     <div id="toast" class="toast"></div>
   </div>
 
-  <script>
-    const sampleMaterials = [
-      {
-        id: '1',
-        title: 'Grade 12 Physics & Exam Guide',
-        author: 'Dr. Abebe T.',
-        category: 'Science',
-        price: 250,
-        type: 'Physical Book',
-        description: 'Comprehensive physics formulas, exercises, and past exam questions with step-by-step solutions.',
-        icon: '📘'
-      },
-      {
-        id: '2',
-        title: 'Python Programming for Beginners',
-        author: 'Sarah Jenkins',
-        category: 'Computer Science',
-        price: 180,
-        type: 'PDF / E-Book',
-        description: 'Learn coding from scratch. Covers variables, data structures, OOP, and mini projects.',
-        icon: '📄'
-      },
-      {
-        id: '3',
-        title: 'University Calculus & Linear Algebra',
-        author: 'Prof. Markos G.',
-        category: 'Mathematics',
-        price: 320,
-        type: 'Physical Book',
-        description: 'Standard textbook for engineering and natural science freshman courses.',
-        icon: '🧮'
-      },
-      {
-        id: '4',
-        title: 'English Grammar & Writing Skills',
-        author: 'Helen Brook',
-        category: 'Languages',
-        price: 150,
-        type: 'PDF / E-Book',
-        description: 'Essential rules, essay templates, and vocabulary lists for students and professionals.',
-        icon: '🌐'
-      }
-    ];
-
-    const categories = ['All', 'Science', 'Mathematics', 'Computer Science', 'Languages'];
-    let selectedCategory = 'All';
-    let cart = [];
-
-    function showScreen(screenId) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(screenId).classList.add('active');
-    }
-
-    function renderChips() {
-      const container = document.getElementById('categoryChips');
-      container.innerHTML = categories
-        .map(cat => `
-          <button class="chip ${selectedCategory === cat ? 'active' : ''}" onclick="selectCategory('${cat}')">
-            ${cat}
-          </button>
-        `)
-        .join('');
-    }
-
-    function selectCategory(cat) {
-      selectedCategory = cat;
-      renderChips();
-      renderCatalog();
-    }
-
-    function renderCatalog() {
-      const query = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = sampleMaterials.filter(item => {
-        const matchesSearch =
-          item.title.toLowerCase().includes(query) ||
-          item.author.toLowerCase().includes(query);
-        const matchesCat = selectedCategory === 'All' || item.category === selectedCategory;
-        return matchesSearch && matchesCat;
-      });
-
-      const list = document.getElementById('materialsList');
-      if (filtered.length === 0) {
-        list.innerHTML = `<div class="empty-state">No learning materials found.</div>`;
-        return;
-      }
-
-      list.innerHTML = filtered
-        .map(item => `
-          <div class="card" onclick="openDetail('${item.id}')">
-            <div class="avatar">${item.icon}</div>
-            <div class="card-info">
-              <div class="card-title">${item.title}</div>
-              <div class="card-sub">${item.author} • ${item.type}</div>
-            </div>
-            <div class="price">${item.price} ETB</div>
-          </div>
-        `)
-        .join('');
-    }
-
-    function openDetail(id) {
-      const item = sampleMaterials.find(m => m.id === id);
-      if (!item) return;
-
-      document.getElementById('detailHeaderTitle').textContent = item.title;
-      document.getElementById('detailIcon').textContent = item.icon;
-      document.getElementById('detailTitle').textContent = item.title;
-      document.getElementById('detailAuthor').textContent = `By ${item.author}`;
-      document.getElementById('detailType').textContent = item.type;
-      document.getElementById('detailDesc').textContent = item.description;
-      document.getElementById('detailPrice').textContent = `${item.price} ETB`;
-
-      document.getElementById('addToCartBtn').onclick = () => {
-        cart.push(item);
-        updateCartBadge();
-        showToast(`${item.title} added to cart!`);
-        showScreen('catalogScreen');
-      };
-
-      showScreen('detailScreen');
-    }
-
-    function updateCartBadge() {
-      const badge = document.getElementById('cartBadge');
-      if (cart.length > 0) {
-        badge.style.display = 'flex';
-        badge.textContent = cart.length;
-      } else {
-        badge.style.display = 'none';
-      }
-    }
-
-    function openCart() {
-      renderCart();
-      showScreen('cartScreen');
-    }
-
-    function renderCart() {
-      const list = document.getElementById('cartList');
-      const checkoutBar = document.getElementById('checkoutBar');
-
-      if (cart.length === 0) {
-        list.innerHTML = `<div class="empty-state">Your cart is empty.</div>`;
-        checkoutBar.style.display = 'none';
-        return;
-      }
-
-      checkoutBar.style.display = 'block';
-      const total = cart.reduce((sum, item) => sum + item.price, 0);
-      document.getElementById('cartTotal').textContent = `${total} ETB`;
-
-      list.innerHTML = cart
-        .map((item, idx) => `
-          <div class="cart-item">
-            <div class="avatar">${item.icon}</div>
-            <div class="card-info">
-              <div class="card-title">${item.title}</div>
-              <div class="card-sub">${item.price} ETB (${item.type})</div>
-            </div>
-            <button class="delete-btn" onclick="removeFromCart(${idx})" title="Remove">🗑️</button>
-          </div>
-        `)
-        .join('');
-    }
-
-    function removeFromCart(index) {
-      cart.splice(index, 1);
-      updateCartBadge();
-      renderCart();
-    }
-
-    function openPaymentSheet() {
-      document.getElementById('paymentOverlay').classList.add('open');
-    }
-
-    function closePaymentSheet(e) {
-      if (e.target.id === 'paymentOverlay') {
-        document.getElementById('paymentOverlay').classList.remove('open');
-      }
-    }
-
-    function completeOrder(method) {
-      document.getElementById('paymentOverlay').classList.remove('open');
-      document.getElementById('confirmMessage').textContent =
-        `Payment via ${method} initiated. You will receive an SMS/Email receipt.`;
-      document.getElementById('confirmDialog').classList.add('open');
-    }
-
-    function finishOrder() {
-      document.getElementById('confirmDialog').classList.remove('open');
-      cart = [];
-      updateCartBadge();
-      showScreen('catalogScreen');
-    }
-
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2200);
-    }
-
-    renderChips();
-    renderCatalog();
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
