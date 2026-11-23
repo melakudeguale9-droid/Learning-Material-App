@@ -41,6 +41,11 @@
   }
 
   .chips {
+    padding: 4px 26px 8px;
+    gap: 10px;
+  }
+
+  .difficulty-chips {
     padding: 4px 26px 12px;
     gap: 10px;
   }
@@ -58,7 +63,7 @@
 
   #materialsList {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     align-content: start;
     gap: 14px;
     padding: 8px 22px 24px;
@@ -66,10 +71,10 @@
 
   #cartList,
   .detail-body {
-    max-width: 760px;
+    max-width: 860px;
     width: 100%;
     margin: 0 auto;
-    padding: 24px 28px;
+    padding: 22px 28px;
   }
 
   .checkout-bar {
@@ -96,7 +101,7 @@
   }
 
   .level-sidebar {
-    max-height: 155px;
+    max-height: 145px;
     border-bottom: 1px solid var(--border);
     padding: 8px 12px;
   }
