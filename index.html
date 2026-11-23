@@ -23,6 +23,7 @@
         </div>
       </div>
 
+      <!-- Search Bar -->
       <div class="search-box">
         <input
           type="text"
@@ -32,8 +33,18 @@
         />
       </div>
 
+      <!-- Top Horizontal Tech Categories: All, Cyber, AI, Developer, Robotics -->
       <div class="chips" id="categoryChips"></div>
-      <div class="list-area" id="materialsList"></div>
+
+      <!-- Main Workspace: Left Grade/University Tree + Right Materials List -->
+      <div class="catalog-workspace">
+        <aside class="level-sidebar" id="levelSidebar"></aside>
+
+        <div class="catalog-content">
+          <div class="active-filter-bar" id="activeFilterBar"></div>
+          <div class="list-area" id="materialsList"></div>
+        </div>
+      </div>
     </div>
 
     <!-- 2. DETAIL SCREEN -->
@@ -52,6 +63,7 @@
         <div class="detail-author" id="detailAuthor"></div>
         <div class="pill-row">
           <span class="type-pill" id="detailCategory"></span>
+          <span class="type-pill" id="detailLevel"></span>
           <span class="type-pill" id="detailType"></span>
         </div>
 
@@ -95,7 +107,7 @@
         <form id="addBookForm" onsubmit="addNewBook(event)">
           <div class="form-group">
             <label for="bookTitle">Title</label>
-            <input type="text" id="bookTitle" placeholder="e.g. Web Security Essentials" required />
+            <input type="text" id="bookTitle" placeholder="e.g. Network Security Fundamentals" required />
           </div>
           <div class="form-group">
             <label for="bookAuthor">Author</label>
@@ -105,24 +117,38 @@
             <div class="form-group">
               <label for="bookCategory">Category</label>
               <select id="bookCategory">
-                <option value="Science">Science</option>
-                <option value="Mathematics">Mathematics</option>
-                <option value="Computer Science">Computer Science</option>
-                <option value="Cybersecurity">Cybersecurity</option>
-                <option value="Languages">Languages</option>
+                <option value="Cyber">Cyber</option>
+                <option value="AI">AI</option>
+                <option value="Developer">Developer</option>
+                <option value="Robotics">Robotics</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="bookLevel">Grade / Level</label>
+              <select id="bookLevel">
+                <option value="1 - 4 Grade">1 - 4 Grade</option>
+                <option value="5 - 8 Grade">5 - 8 Grade</option>
+                <option value="9 - 12 Grade">9 - 12 Grade</option>
+                <option value="University|1st Year">University - 1st Year</option>
+                <option value="University|2nd Year">University - 2nd Year</option>
+                <option value="University|3rd Year">University - 3rd Year</option>
+                <option value="University|4th Year">University - 4th Year</option>
+                <option value="University|5th Year">University - 5th Year</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bookType">Format</label>
+              <select id="bookType">
+                <option value="Physical Book">Physical Book</option>
+                <option value="PDF / E-Book">PDF / E-Book</option>
               </select>
             </div>
             <div class="form-group">
               <label for="bookPrice">Price (ETB)</label>
               <input type="number" id="bookPrice" min="1" placeholder="200" required />
             </div>
-          </div>
-          <div class="form-group">
-            <label for="bookType">Format</label>
-            <select id="bookType">
-              <option value="Physical Book">Physical Book</option>
-              <option value="PDF / E-Book">PDF / E-Book</option>
-            </select>
           </div>
           <div class="form-group">
             <label for="bookDesc">Description</label>
