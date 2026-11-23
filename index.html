@@ -33,8 +33,11 @@
         />
       </div>
 
-      <!-- Top Horizontal Tech Categories: All, Cyber, AI, Developer, Robotics -->
+      <!-- Row 1: Domain Categories (All, Cyber, AI, Developer, Robotics) -->
       <div class="chips" id="categoryChips"></div>
+
+      <!-- Row 2: Skill Levels (All, Beginner, Intermediate, Advanced) -->
+      <div class="difficulty-chips" id="difficultyChips"></div>
 
       <!-- Main Workspace: Left Grade/University Tree + Right Materials List -->
       <div class="catalog-workspace">
@@ -47,33 +50,45 @@
       </div>
     </div>
 
-    <!-- 2. DETAIL SCREEN -->
+    <!-- 2. DETAIL SCREEN (5 FEATURES: Book, PDF, Link Reading, 10-Q Quiz Lvl 1-100, Video Amharic/English) -->
     <div id="detailScreen" class="screen">
       <div class="app-bar">
         <div class="app-bar-left">
           <button class="icon-btn" onclick="showScreen('catalogScreen')">←</button>
           <h1 id="detailHeaderTitle">Details</h1>
         </div>
-        <button class="icon-btn" id="deleteBookBtn" title="Delete Book from Store">🗑️</button>
+        <div class="app-bar-actions">
+          <button class="icon-btn" id="addToCartBtn" title="Save to My List">🔖</button>
+          <button class="icon-btn" id="deleteBookBtn" title="Delete Book from Store">🗑️</button>
+        </div>
       </div>
 
       <div class="detail-body">
-        <div class="detail-hero" id="detailIcon">📘</div>
-        <div class="detail-title" id="detailTitle"></div>
-        <div class="detail-author" id="detailAuthor"></div>
-        <div class="pill-row">
-          <span class="type-pill" id="detailCategory"></span>
-          <span class="type-pill" id="detailLevel"></span>
-          <span class="type-pill" id="detailType"></span>
+        <!-- Book Header Summary -->
+        <div class="detail-top-card">
+          <div class="detail-hero-sm" id="detailIcon">📘</div>
+          <div class="detail-meta">
+            <div class="detail-title" id="detailTitle"></div>
+            <div class="detail-author" id="detailAuthor"></div>
+            <div class="pill-row">
+              <span class="type-pill" id="detailCategory"></span>
+              <span class="type-pill" id="detailDifficulty"></span>
+              <span class="type-pill" id="detailLevel"></span>
+            </div>
+          </div>
         </div>
 
-        <div class="divider"></div>
-        <div class="desc-heading">Description</div>
-        <p class="desc-text" id="detailDesc"></p>
-
-        <div class="detail-footer">
-          <button class="btn-primary full-btn" id="addToCartBtn">🔖 Save to My List</button>
+        <!-- 5 Learning Mode Tabs -->
+        <div class="resource-tabs" id="resourceTabs">
+          <button class="res-tab active" data-tab="book" onclick="switchResourceTab('book')">📘 Book</button>
+          <button class="res-tab" data-tab="pdf" onclick="switchResourceTab('pdf')">📄 PDF</button>
+          <button class="res-tab" data-tab="links" onclick="switchResourceTab('links')">🔗 Link Reading</button>
+          <button class="res-tab" data-tab="quiz" onclick="switchResourceTab('quiz')">📝 Self-Test (1–100)</button>
+          <button class="res-tab" data-tab="video" onclick="switchResourceTab('video')">🎬 Video</button>
         </div>
+
+        <!-- Tab Content Container -->
+        <div id="resourceTabContent" class="tab-panel"></div>
       </div>
     </div>
 
@@ -102,7 +117,7 @@
         <form id="addBookForm" onsubmit="addNewBook(event)">
           <div class="form-group">
             <label for="bookTitle">Title</label>
-            <input type="text" id="bookTitle" placeholder="e.g. Network Security Fundamentals" required />
+            <input type="text" id="bookTitle" placeholder="e.g. Safe Internet Basics" required />
           </div>
           <div class="form-group">
             <label for="bookAuthor">Author</label>
@@ -119,7 +134,17 @@
               </select>
             </div>
             <div class="form-group">
-              <label for="bookLevel">Grade / Level</label>
+              <label for="bookDifficulty">Skill Level</label>
+              <select id="bookDifficulty">
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bookLevel">Grade / Academic Level</label>
               <select id="bookLevel">
                 <option value="1 - 4 Grade">1 - 4 Grade</option>
                 <option value="5 - 8 Grade">5 - 8 Grade</option>
@@ -131,16 +156,23 @@
                 <option value="University|5th Year">University - 5th Year</option>
               </select>
             </div>
+            <div class="form-group">
+              <label for="bookPdfUrl">PDF Link (Optional)</label>
+              <input type="url" id="bookPdfUrl" placeholder="https://..." />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bookAmharicVideo">Amharic Video Link (Optional)</label>
+              <input type="url" id="bookAmharicVideo" placeholder="https://youtube.com/..." />
+            </div>
+            <div class="form-group">
+              <label for="bookEnglishVideo">English Video Link (Optional)</label>
+              <input type="url" id="bookEnglishVideo" placeholder="https://youtube.com/..." />
+            </div>
           </div>
           <div class="form-group">
-            <label for="bookType">Format</label>
-            <select id="bookType">
-              <option value="Physical Book">Physical Book</option>
-              <option value="PDF / E-Book">PDF / E-Book</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="bookDesc">Description</label>
+            <label for="bookDesc">Book Summary / Chapters</label>
             <textarea id="bookDesc" rows="2" placeholder="Short summary of the material..." required></textarea>
           </div>
           <div class="dialog-actions">
@@ -166,6 +198,7 @@
   </div>
 
   <script src="js/data.js"></script>
+  <script src="js/quiz.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/app.js"></script>
 </body>
